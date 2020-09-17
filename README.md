@@ -15,6 +15,14 @@ docker run -itd --restart always \
     steemfans/easy-follow-vote:latest
 ```
 
+* `STEEMD` is the api url.
+* `WORKER_NUM` is the total of worker.
+* `TO_FOLLOW` is the people you want to follow voting.
+* `VOTER` is the username who vote.
+* `VOTER_PRIV_KEY` is the posting key of `VOTER`.
+* `WEIGHT` is the vote weight. It need be bigger than 0 and lower than 100. The unit is %.
+* `VP_THRESHOLD` is the threshold of voting power. The default value is 30%. The unit is %.
+
 ### Issues
 If you have any issue, please be easy to submit on the [issue page](https://github.com/steemfans/easy-follow-vote/issues).
 
