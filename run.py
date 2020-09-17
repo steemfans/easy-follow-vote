@@ -9,6 +9,7 @@ from steem.commit import Commit
 from steem.account import Account
 from steem.post import Post
 from steem import Steem
+import datetime
 import traceback
 
 env_dist = os.environ
@@ -110,6 +111,11 @@ def current_voting_power(username):
     if total_vp > 100:
         total_vp = 100
     return total_vp
+
+def parse_time(block_time):
+    """Take a string representation of time from the blockchain, and parse it into datetime object.
+    """
+    return datetime.strptime(block_time, '%Y-%m-%dT%H:%M:%S')
 
 def run():
     start_block_num = int(b.info()['head_block_number'])
