@@ -6,6 +6,8 @@ from concurrent import futures
 from steem.blockchain import Blockchain
 from steem.steemd import Steemd
 from steem.commit import Commit
+from steem.account import Account
+from steem.post import Post
 from steem import Steem
 import traceback
 
@@ -81,9 +83,16 @@ def worker(start, end):
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
                             if current_voting_power(voter) > vp_threshold:
-                                post_str = '@' + op[1]['author'] + '/' + op[1]['permlink']
-                                c.vote(post_str, weight, voter)
-                                print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
+                                post_str = op[1]['author'] + '/' + op[1]['permlink']
+                                post_instance = Post(post_str, s)
+                                voter_instance = Account(voter, s)
+                                if voter_instance.has_voted(post_instance):
+                                    print('[log] has voted %s' % (post_str))
+                                else:
+                                    c.vote(post_str, weight, voter)
+                                    print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
+                            else:
+                                print('[log] voting power is not enough.')
     except:
         print('[error] from %s to %s' % (start, end), sys.exc_info())
 
