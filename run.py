@@ -85,13 +85,13 @@ def worker(start, end):
                         if op[1]['voter'] in to_follow:
                             if op[1]['weight'] > 0:
                                 if current_voting_power(voter) > vp_threshold:
-                                    post_str = op[1]['author'] + '/' + op[1]['permlink']
+                                    post_str = '@' + op[1]['author'] + '/' + op[1]['permlink']
                                     post_instance = Post(post_str, s)
                                     voter_instance = Account(voter, s)
                                     if voter_instance.has_voted(post_instance):
                                         print('[log] has voted %s' % (post_str))
                                     else:
-                                        c.vote(post_str, weight / 1.0, voter)
+                                        c.vote(post_str, weight/1.0, voter)
                                         print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
                                 else:
                                     print('[log] voting power is not enough.')
