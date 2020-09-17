@@ -96,7 +96,10 @@ def worker(start, end):
                                 else:
                                     print('[log] voting power is not enough.')
     except:
-        print('[error] from %s to %s' % (start, end), sys.exc_info())
+        exc_info = sys.exc_info()
+        print('[error] from %s to %s' % (start, end), exc_info)
+        if exc_info != (None, None, None):
+            traceback.print_exception(*exc_info)
 
 def current_voting_power(username):
     """
