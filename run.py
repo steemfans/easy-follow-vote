@@ -83,17 +83,18 @@ def worker(start, end):
                 for op in operations:
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
-                            if current_voting_power(voter) > vp_threshold:
-                                post_str = op[1]['author'] + '/' + op[1]['permlink']
-                                post_instance = Post(post_str, s)
-                                voter_instance = Account(voter, s)
-                                if voter_instance.has_voted(post_instance):
-                                    print('[log] has voted %s' % (post_str))
+                            if op[1]['weight'] > 0:
+                                if current_voting_power(voter) > vp_threshold:
+                                    post_str = op[1]['author'] + '/' + op[1]['permlink']
+                                    post_instance = Post(post_str, s)
+                                    voter_instance = Account(voter, s)
+                                    if voter_instance.has_voted(post_instance):
+                                        print('[log] has voted %s' % (post_str))
+                                    else:
+                                        c.vote(post_str, weight, voter)
+                                        print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
                                 else:
-                                    c.vote(post_str, weight, voter)
-                                    print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
-                            else:
-                                print('[log] voting power is not enough.')
+                                    print('[log] voting power is not enough.')
     except:
         print('[error] from %s to %s' % (start, end), sys.exc_info())
 
@@ -115,7 +116,7 @@ def current_voting_power(username):
 def parse_time(block_time):
     """Take a string representation of time from the blockchain, and parse it into datetime object.
     """
-    return datetime.strptime(block_time, '%Y-%m-%dT%H:%M:%S')
+    return datetime.datetime.strptime(block_time, '%Y-%m-%dT%H:%M:%S')
 
 def run():
     start_block_num = int(b.info()['head_block_number'])
