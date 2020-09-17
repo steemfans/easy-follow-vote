@@ -37,16 +37,22 @@ if voter == None or voter == "":
     sys.exit()
 print('VOTER: %s' % (voter))
 
-weight = env_dist.get('WEIGHT')
-if weight == None or weight == "":
-    weight = 5000
-weight = int(weight)
-print('WEIGHT: %s' % (weight))
-
 voter_priv_key = env_dist.get('VOTER_PRIV_KEY')
 if voter_priv_key == None or voter_priv_key == "":
     print('need setting VOTER_PRIV_KEY')
     sys.exit()
+
+weight = env_dist.get('WEIGHT')
+if weight == None or weight == "":
+    weight = 50
+weight = int(weight)
+print('WEIGHT: %s' % (weight))
+
+weight_threshold = env_dist.get('WEIGHT_THRESHOLD')
+if weight_threshold == None or weight_threshold == "":
+    weight_threshold = 30
+weight_threshold = int(weight_threshold)
+print('WEIGHT_THRESHOLD: %s' % (weight_threshold))
 
 print('-------- env params --------')
 
@@ -54,13 +60,13 @@ print('-------- env params --------')
 steemd_nodes = [
     steemd_url,
 ]
-s = Steemd(nodes=steemd_nodes)
-c = Commit(steemd_instance=s, steem=Steem(keys=[voter_priv_key]))
+S = Steem(nodes=steemd_nodes, keys=[voter_priv_key])
+s = S.steemd
+c = S.commit
 b = Blockchain(s)
 
 def worker(start, end):
     try:
-        global s, b, to_follow
         print('start from {start} to {end}'.format(start=start, end=end))
         
         # get block
@@ -74,15 +80,29 @@ def worker(start, end):
                 for op in operations:
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
-                            post_str = '@' + op[1]['author'] + '/' + op[1]['permlink']
-                            c.vote(post_str, weight / 100, voter)
-                            print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight / 100))
+                            if current_voting_power(voter) > weight_threshold:
+                                post_str = '@' + op[1]['author'] + '/' + op[1]['permlink']
+                                c.vote(post_str, weight, voter)
+                                print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
     except:
         print('[error] from %s to %s' % (start, end), sys.exc_info())
 
-def run():
-    global s, b
+def current_voting_power(username):
+    """
+    This helper method also takes into account the regenerated
+    voting power.
+    """
+    account_info = s.get_account(username)
+    last_vote_time = parse_time(account_info["last_vote_time"])
+    diff_in_seconds = (datetime.datetime.utcnow() -
+                       last_vote_time).total_seconds()
+    regenerated_vp = diff_in_seconds * 10000 / 86400 / 5
+    total_vp = (account_info["voting_power"] + regenerated_vp) / 100
+    if total_vp > 100:
+        total_vp = 100
+    return total_vp
 
+def run():
     start_block_num = int(b.info()['head_block_number'])
 
     while True:
