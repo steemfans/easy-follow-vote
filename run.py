@@ -48,11 +48,11 @@ if weight == None or weight == "":
 weight = int(weight)
 print('WEIGHT: %s' % (weight))
 
-weight_threshold = env_dist.get('WEIGHT_THRESHOLD')
-if weight_threshold == None or weight_threshold == "":
-    weight_threshold = 30
-weight_threshold = int(weight_threshold)
-print('WEIGHT_THRESHOLD: %s' % (weight_threshold))
+vp_threshold = env_dist.get('VP_THRESHOLD')
+if vp_threshold == None or vp_threshold == "":
+    vp_threshold = 30
+vp_threshold = int(vp_threshold)
+print('VP_THRESHOLD: %s' % (vp_threshold))
 
 print('-------- env params --------')
 
@@ -80,7 +80,7 @@ def worker(start, end):
                 for op in operations:
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
-                            if current_voting_power(voter) > weight_threshold:
+                            if current_voting_power(voter) > vp_threshold:
                                 post_str = '@' + op[1]['author'] + '/' + op[1]['permlink']
                                 c.vote(post_str, weight, voter)
                                 print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
