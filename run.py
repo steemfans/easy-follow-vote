@@ -91,7 +91,7 @@ def worker(start, end):
                                     if voter_instance.has_voted(post_instance):
                                         print('[log] has voted %s' % (post_str))
                                     else:
-                                        c.vote(post_str, weight, voter)
+                                        c.vote(post_str, weight / 1.0, voter)
                                         print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
                                 else:
                                     print('[log] voting power is not enough.')
