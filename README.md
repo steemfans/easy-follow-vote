@@ -9,7 +9,8 @@ docker run -itd --restart always \
     -e WORKER_NUM=1 \
     -e TO_FOLLOW=justyy,wherein \
     -e VOTER=ety001 \
-    -e WEIGHT=5000 \
     -e VOTER_PRIV_KEY=5J****** \
+    -e WEIGHT=50 \
+    -e WEIGHT_THRESHOLD=30 \
     steemfans/easy-follow-vote
 ```
