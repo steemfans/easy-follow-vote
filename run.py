@@ -5,6 +5,7 @@ from contextlib import suppress
 from concurrent import futures
 from steem.blockchain import Blockchain
 from steem.steemd import Steemd
+from steem.commit import Commit
 from steem import Steem
 import traceback
 
