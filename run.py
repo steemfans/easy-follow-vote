@@ -40,6 +40,13 @@ if voter == None or voter == "":
     sys.exit()
 print('VOTER: %s' % (voter))
 
+must_vote_str = env_dist.get('MUST_VOTE')
+if must_vote_str == None or must_vote_str == "":
+    print('no set MUST_VOTE')
+else:
+    must_vote = must_vote_str.split(',')
+    print('must_vote: %s' % (must_vote))
+
 voter_priv_key = env_dist.get('VOTER_PRIV_KEY')
 if voter_priv_key == None or voter_priv_key == "":
     print('need setting VOTER_PRIV_KEY')
@@ -49,6 +56,7 @@ weight = env_dist.get('WEIGHT')
 if weight == None or weight == "":
     weight = 50
 weight = int(weight)
+full_weight = int(100)
 print('WEIGHT: %s' % (weight))
 
 vp_threshold = env_dist.get('VP_THRESHOLD')
@@ -81,20 +89,13 @@ def worker(start, end):
                 # print(trans)
                 operations = trans['operations']
                 for op in operations:
+                    if op[0] in ['comment']:
+                        if op[1]['author'] in must_vote and op[1]['parent_permlink'] == '':
+                            vote_method(op[1]['author'], op[1]['permlink'], None)
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
                             if op[1]['weight'] > 0:
-                                if current_voting_power(voter) > vp_threshold:
-                                    post_str = '@' + op[1]['author'] + '/' + op[1]['permlink']
-                                    post_instance = Post(post_str, s)
-                                    voter_instance = Account(voter, s)
-                                    if voter_instance.has_voted(post_instance):
-                                        print('[log] has voted %s' % (post_str))
-                                    else:
-                                        c.vote(post_str, weight/1.0, voter)
-                                        print('[log] follow %s to vote %s by %s' % (op[1]['voter'], post_str, weight))
-                                else:
-                                    print('[log] voting power is not enough.')
+                                vote_method(op[1]['author'], op[1]['permlink'], op[1]['voter'])
     except:
         exc_info = sys.exc_info()
         print('[error] from %s to %s' % (start, end), exc_info)
@@ -115,6 +116,25 @@ def current_voting_power(username):
     if total_vp > 100:
         total_vp = 100
     return total_vp
+
+def vote_method(author, permlink, follow):
+    post_str = '@' + author + '/' + permlink
+    post_instance = Post(post_str, s)
+    voter_instance = Account(voter, s)
+    if voter_instance.has_voted(post_instance):
+        print('[log] has voted %s' % (post_str))
+        return
+
+    if follow is None:
+        c.vote(post_str, full_weight/1.0, voter)
+        print('[log] Must vote %s by %s' % (post_str, full_weight))
+        return
+
+    if current_voting_power(voter) > vp_threshold:
+        c.vote(post_str, weight/1.0, voter)
+        print('[log] follow %s to vote %s by %s' % (follow, post_str, weight))
+    else:
+        print('[log] voting power is not enough.')
 
 def parse_time(block_time):
     """Take a string representation of time from the blockchain, and parse it into datetime object.
