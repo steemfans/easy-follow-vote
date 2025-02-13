@@ -9,6 +9,7 @@ docker run -itd --restart always \
     -e WORKER_NUM=1 \
     -e TO_FOLLOW=justyy,wherein \
     -e VOTER=ety001 \
+    -e MUST_VOTE=ldsn001,steemit \
     -e VOTER_PRIV_KEY=5J****** \
     -e WEIGHT=50 \
     -e VP_THRESHOLD=30 \
@@ -19,6 +20,7 @@ docker run -itd --restart always \
 * `WORKER_NUM` is the total of worker.
 * `TO_FOLLOW` is the people you want to follow voting.
 * `VOTER` is the username who vote.
+* `MUST_VOTE` is the authors you must vote.
 * `VOTER_PRIV_KEY` is the posting key of `VOTER`.
 * `WEIGHT` is the vote weight. It need be bigger than 0 and lower than 100. The unit is %.
 * `VP_THRESHOLD` is the threshold of voting power. The default value is 30%. The unit is %.
