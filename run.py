@@ -90,8 +90,10 @@ def worker(start, end):
                 operations = trans['operations']
                 for op in operations:
                     if op[0] in ['comment']:
-                        if op[1]['author'] in must_vote and op[1]['parent_permlink'] == '':
-                            vote_method(op[1]['author'], op[1]['permlink'], None)
+                        if op[1]['author'] in must_vote:
+                            print('[debug] must vote: %s' % (op[1]['parent_permlink']))
+                            if op[1]['parent_permlink'] == '' or op[1]['parent_permlink'] is None:
+                                vote_method(op[1]['author'], op[1]['permlink'], None)
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
                             if op[1]['weight'] > 0:
