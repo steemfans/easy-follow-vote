@@ -76,6 +76,8 @@ s = S.steemd
 c = S.commit
 b = Blockchain(s)
 
+last_vote_time = 0  # 全局变量记录上次执行时间戳
+
 def worker(start, end):
     try:
         print('start from {start} to {end}'.format(start=start, end=end))
@@ -120,6 +122,14 @@ def current_voting_power(username):
     return total_vp
 
 def vote_method(author, permlink, follow):
+    global last_vote_time
+    current_time = time.time()  # 获取当前时间戳
+
+    # 检查时间间隔
+    if current_time - last_vote_time < 3:
+        time.sleep(3)  # 如果间隔小于3秒，先休眠3秒
+
+    last_vote_time = time.time()  # 更新上次执行时间戳
     post_str = '@' + author + '/' + permlink
     post_instance = Post(post_str, s)
     voter_instance = Account(voter, s)
