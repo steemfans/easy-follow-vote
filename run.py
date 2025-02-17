@@ -92,7 +92,7 @@ def worker(start, end):
                     if op[0] in ['comment']:
                         if op[1]['author'] in must_vote:
                             print(f"[debug] must vote: {op[1]}")
-                            if op[1]['parent_author'] != '':
+                            if op[1]['parent_author'] == '':
                                 vote_method(op[1]['author'], op[1]['permlink'], None)
                     if op[0] in ['vote']:
                         if op[1]['voter'] in to_follow:
